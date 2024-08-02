@@ -81,6 +81,16 @@ class Device {
     }
   }
 
+  Future<void> setThemeMode(String theme) async {
+    if (type == DeviceType.android) {
+      await setAndroidThemeMode(this, theme);
+    } else if (type == DeviceType.iOS) {
+      await setIOSThemeMode(this, theme);
+    } else {
+      throw InvalidDeviceException("setThemeMode: Unsupported device [$this].");
+    }
+  }
+
   Future<void> loadDeepLink(
       String baseUrl, String path, Map<String, String> bundleId) async {
     if (type == DeviceType.android) {

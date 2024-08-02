@@ -246,3 +246,23 @@ Future<void> loadAndroidData(
     );
   });
 }
+
+Future<void> setAndroidThemeMode(Device device, String themeMode) async {
+  // adb shell settings put system ui_night_mode 2
+  await runToCompletion(
+    process: Process.run(
+      "adb",
+      [
+        "-s",
+        device.androidId,
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        themeMode == 'dark' ? 'yes' : 'no',
+      ],
+    ),
+    onException: (data) =>
+        AndroidCommandException("Couldn't set theme mode. $data"),
+  );
+}

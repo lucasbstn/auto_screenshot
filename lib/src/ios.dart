@@ -145,3 +145,21 @@ Future<void> loadIOSData(
     File(file.path).copySync(path.join(docsPath, path.basename(file.path)));
   });
 }
+
+Future<void> setIOSThemeMode(Device device, String themeMode) async {
+  // xcrun simctl ui booted appearance light
+  await runToCompletion(
+    process: Process.run(
+      "xcrun",
+      [
+        "simctl",
+        "ui",
+        device.id,
+        'appearance',
+        themeMode,
+      ],
+    ),
+    onException: (data) =>
+        IOSCommandException("Couldn't set theme mode. $data"),
+  );
+}

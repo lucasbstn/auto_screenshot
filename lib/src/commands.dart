@@ -54,16 +54,29 @@ Future<void> captureScreensOnDevice(
       config.outputFolder, device.name.replaceAll(nonAlphaNumericRx, '_'));
   await device.loadDeepLink(baseUrl, "", config.bundleId);
   await Future.delayed(Duration(seconds: 8));
-  for (var capturePath in config.paths) {
-    await device.loadDeepLink(baseUrl, capturePath, config.bundleId);
-    await Future.delayed(Duration(seconds: 1));
+  for (var item in config.paths) {
+    await device.loadDeepLink(baseUrl, item.path, config.bundleId);
+    await Future.delayed(config.timeout ?? Duration(seconds: 1));
+    if (config.theme == 'light' || config.theme == 'both') {
+      await device.captureScreen(
+        path.join(
+          outputFolder,
+          '${(item.lightName ?? item.name ?? item.path).replaceAll(nonAlphaNumericRx, '_')}_light.png',
+        ),
+      );
+    }
 
-    await device.captureScreen(
-      path.join(
-        outputFolder,
-        '${capturePath.replaceAll(nonAlphaNumericRx, '_')}.png',
-      ),
-    );
+    if (config.theme == 'dark' || config.theme == 'both') {
+      await device.setThemeMode('dark');
+      await Future.delayed(config.timeout ?? Duration(seconds: 1));
+      await device.captureScreen(
+        path.join(
+          outputFolder,
+          '${(item.darkName ?? item.name ?? item.path).replaceAll(nonAlphaNumericRx, '_')}_dark.png',
+        ),
+      );
+      await device.setThemeMode('light');
+    }
   }
 
   print('Captured ${config.paths.length} screen(s) on [$device].');
